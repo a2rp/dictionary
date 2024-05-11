@@ -1,0 +1,102 @@
+.container {
+    display: flex;
+    justify-content: center;
+
+    .main {
+        width: 100%;
+        max-width: 1440px;
+
+        .heading {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .form {
+            margin-top: 30px;
+            display: flex;
+            gap: 30px;
+
+            .submitButton {
+                width: 150px;
+                height: 50px;
+                overflow: hidden;
+            }
+        }
+
+        .outputContainer {
+            margin-top: 30px;
+
+            .wordContainer {
+                border: 1px solid #000;
+                padding: 15px;
+                margin: 15px;
+                border-radius: 5px;
+
+                .theWord {
+                    font-size: 32px;
+                    font-weight: 900;
+                }
+
+                .meaningsContainer {
+                    .meaning {
+                        .partOfSpeech {
+                            margin-top: 15px;
+
+                            .partOfSpeechHeading {
+                                font-size: 20px;
+                                font-weight: 900;
+                            }
+                        }
+
+                        .synonyms {
+                            margin-top: 15px;
+
+                            .synonymsHeading {
+                                font-size: 20px;
+                                font-weight: 900;
+                            }
+
+                            .synonym {
+                                padding: 5px;
+                            }
+                        }
+
+                        .antonyms {
+                            margin-top: 15px;
+
+                            .antonymsHeading {
+                                font-size: 20px;
+                                font-weight: 900;
+                            }
+
+                            .antonym {
+                                padding: 5px;
+                            }
+                        }
+
+                        .definitions {
+                            margin-top: 15px;
+
+                            .definitionHeading {
+                                font-size: 20px;
+                                font-weight: 900;
+                            }
+
+                            .definitionExample {
+                                margin-top: 15px;
+                                padding: 5px;
+
+                                .definition {
+                                }
+
+                                .example {
+                                    font-style: italic;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
