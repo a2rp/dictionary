@@ -1,6 +1,6 @@
-import React from 'react'
+﻿import React from 'react'
 import Dictionary from './dictionary/Dictionary'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
@@ -13,4 +13,5 @@ const App = () => {
 }
 
 export default App
+
 

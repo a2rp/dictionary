@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import styles from "./styles.module.scss";
 import { Button, CircularProgress, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { GiSpeaker } from "react-icons/gi";
+
 
 const Dictionary = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -12,23 +12,35 @@ const Dictionary = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const word = searchWord.trim().toLowerCase();
+        if (!word) return;
         try {
             setIsLoading(true);
-            const options = {
-                url: `https://api.dictionaryapi.dev/api/v2/entries/en_US/${searchWord}`,
-                mwthod: "get"
-            };
-            const response = await axios(options);
-            // console.log(response, "response");
-            setData(response.data);
+            const response = await axios.get(
+                `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=dps&max=1`,
+            );
+            if (!response.data.length) throw new Error("Word not found");
+            const result = response.data[0];
+            const definitions = (result.defs || []).map((definition) => ({
+                definition: definition.replace(/^[a-z]+\t/, ""),
+                example: "",
+            }));
+            setData([{
+                word: result.word,
+                meanings: [{
+                    partOfSpeech: (result.tags || []).find((tag) => tag.startsWith("base")) ? "verb" : "word",
+                    synonyms: [],
+                    antonyms: [],
+                    definitions,
+                }],
+            }]);
         } catch (error) {
-            // console.log(error, "error");
-            toast.error(error.message);
+            setData([]);
+            toast.error(error.message === "Word not found" ? "Word not found. Try another search." : "Dictionary service is temporarily unavailable.");
         } finally {
             setIsLoading(false);
         }
     };
-
     return (
         <div className={styles.container}>
             <div className={styles.main}>
@@ -99,4 +111,9 @@ const Dictionary = () => {
 }
 
 export default Dictionary
+
+
+
+
+
 
