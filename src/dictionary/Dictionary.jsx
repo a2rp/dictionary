@@ -9,7 +9,14 @@ import {
     FaPatreon,
     FaYoutube,
 } from "react-icons/fa";
-import { FiArrowUp, FiCoffee, FiGlobe, FiHeart, FiMail, FiSearch } from "react-icons/fi";
+import {
+    FiArrowUp,
+    FiCoffee,
+    FiGlobe,
+    FiHeart,
+    FiMail,
+    FiSearch,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
 import styles from "./styles.module.scss";
 
@@ -46,6 +53,46 @@ const footerLinks = [
     { label: "Patreon", href: "https://www.patreon.com/a2rp", icon: FaPatreon },
 ];
 
+const partOfSpeechLabels = {
+    n: "noun",
+    v: "verb",
+    adj: "adjective",
+    adv: "adverb",
+    u: "other",
+};
+
+const getMeanings = (result) => {
+    const fallbackCode = (result.tags || []).find((tag) =>
+        Object.prototype.hasOwnProperty.call(partOfSpeechLabels, tag),
+    ) || "u";
+    const definitionsByPartOfSpeech = new Map();
+
+    for (const rawDefinition of result.defs || []) {
+        const separator = rawDefinition.indexOf("\t");
+        const code = separator >= 0
+            ? rawDefinition.slice(0, separator).trim().toLowerCase()
+            : fallbackCode;
+        const definition = (separator >= 0
+            ? rawDefinition.slice(separator + 1)
+            : rawDefinition
+        ).trim();
+
+        if (!definition) continue;
+
+        const partOfSpeech = partOfSpeechLabels[code] || "other";
+        const definitions = definitionsByPartOfSpeech.get(partOfSpeech) || [];
+        definitions.push({ definition, example: "" });
+        definitionsByPartOfSpeech.set(partOfSpeech, definitions);
+    }
+
+    return Array.from(definitionsByPartOfSpeech, ([partOfSpeech, definitions]) => ({
+        partOfSpeech,
+        synonyms: [],
+        antonyms: [],
+        definitions,
+    }));
+};
+
 const Dictionary = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [searchWord, setSearchWord] = useState("");
@@ -66,33 +113,26 @@ const Dictionary = () => {
 
         try {
             setIsLoading(true);
+            setData([]);
             const response = await axios.get(
-                `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=dps&max=1`,
+                "https://api.datamuse.com/words",
+                {
+                    params: { sp: word, qe: "sp", md: "dps", max: 1 },
+                    timeout: 10000,
+                },
             );
 
-            if (!response.data.length) throw new Error("Word not found");
+            const result = response.data.find(
+                (entry) => entry.word.toLowerCase() === word,
+            );
+            const meanings = result ? getMeanings(result) : [];
 
-            const result = response.data[0];
-            const definitions = (result.defs || []).map((definition) => ({
-                definition: definition.replace(/^[a-z]+\t/, ""),
-                example: "",
-            }));
+            if (!meanings.length) throw new Error("Word not found");
 
             setData([
                 {
                     word: result.word,
-                    meanings: [
-                        {
-                            partOfSpeech: (result.tags || []).find((tag) =>
-                                tag.startsWith("base"),
-                            )
-                                ? "verb"
-                                : "word",
-                            synonyms: [],
-                            antonyms: [],
-                            definitions,
-                        },
-                    ],
+                    meanings,
                 },
             ]);
         } catch (error) {
@@ -111,7 +151,10 @@ const Dictionary = () => {
         <div className={styles.container}>
             <header className={styles.header}>
                 <a className={styles.brand} href="./" aria-label="Dictionary home">
-                    <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Ashish Ranjan logo" />
+                    <img
+                        src={`${import.meta.env.BASE_URL}logo.png`}
+                        alt="Ashish Ranjan logo"
+                    />
                     <span>
                         <strong>Dictionary</strong>
                         <small>Find clear meanings fast</small>
@@ -158,7 +201,7 @@ const Dictionary = () => {
                 <div className={styles.outputContainer} aria-live="polite">
                     {data.map((word) => (
                         <div key={word.word} className={styles.wordContainer}>
-                            <div className={styles.theWord}>{word.word}</div>
+                            <h2 className={styles.theWord}>{word.word}</h2>
                             <div className={styles.meaningsContainer}>
                                 {word.meanings.map((meaning) => (
                                     <div className={styles.meaning} key={meaning.partOfSpeech}>
@@ -240,7 +283,16 @@ const Dictionary = () => {
             <button
                 type="button"
                 className={`${styles.goTop} ${showTopButton ? styles.show : ""}`}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                onClick={() =>
+                    window.scrollTo({
+                        top: 0,
+                        behavior: window.matchMedia(
+                            "(prefers-reduced-motion: reduce)",
+                        ).matches
+                            ? "auto"
+                            : "smooth",
+                    })
+                }
                 aria-label="Go to top"
                 title="Go to top"
             >

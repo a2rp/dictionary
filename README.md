@@ -13,13 +13,17 @@ A focused React dictionary app that searches a word and displays its meaning and
 
 ## Tech stack
 
-React, Create React App, Material UI, Axios, Sass, React Icons, and React Toastify.
+React, Vite, Material UI, Axios, Sass, React Icons, and React Toastify.
+
+## Data source
+
+Dictionary definitions and part-of-speech labels come from the [Datamuse API](https://www.datamuse.com/api/). Datamuse's current documentation says API keys will be required for all requests starting February 1, 2027. This static GitHub Pages app does not have API-key authentication configured, so its lookup integration will need an approved key and the documented authentication method before that date.
 
 ## Run locally
 
 ```bash
 npm install
-npm start
+npm run dev
 ```
 
 Build and deploy to GitHub Pages:
