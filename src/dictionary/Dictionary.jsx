@@ -184,6 +184,7 @@ const Dictionary = () => {
                         onChange={(event) => setSearchWord(event.target.value)}
                         fullWidth
                         required
+                        disabled={isLoading}
                         label="Search word"
                         placeholder="Try a word like resilient"
                     />
